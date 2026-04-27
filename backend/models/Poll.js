@@ -39,6 +39,10 @@ const PollSchema = new mongoose.Schema({
     enum: ['basic', 'image', 'ranking', 'meeting'],
     default: 'basic',
   },
+  requireName: {
+    type: Boolean,
+    default: false,
+  },
   options: [OptionSchema],
   // Count of unique voters (not total selections)
   totalVotes: {

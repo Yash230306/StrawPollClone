@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAuth, isPremiumUser } from '../mock/mock';
 import {
   ShieldCheck,
   Clock,
@@ -17,6 +18,21 @@ import { stats, features, testimonials } from '../mock/mock';
 const iconMap = { ShieldCheck, Clock, Smile, BarChart3, Code2, Rocket };
 
 export default function HomePage() {
+  const navigate = useNavigate();
+
+  const handleScheduleMeeting = () => {
+    const user = getAuth();
+    if (!user) {
+      navigate('/signup');
+      return;
+    }
+    if (!isPremiumUser()) {
+      navigate('/pricing');
+      return;
+    }
+    navigate('/create?type=meeting');
+  };
+
   return (
     <div className="bg-white">
       {/* HERO */}
@@ -48,7 +64,7 @@ export default function HomePage() {
                   </Button>
                 </Link>
               </div>
-              <p className="mt-4 text-sm text-indigo-200/70">No signup required</p>
+              <p className="mt-4 text-sm text-indigo-200/70">No signup required for standard polls</p>
             </div>
             <div className="hidden lg:flex items-center justify-center">
               <div className="relative">
@@ -126,11 +142,12 @@ export default function HomePage() {
               participant is important.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link to="/meetings">
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-6 py-5 h-auto font-semibold">
-                  Schedule a meeting
-                </Button>
-              </Link>
+              <button
+                onClick={handleScheduleMeeting}
+                className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-6 py-5 h-auto font-semibold transition-colors"
+              >
+                Schedule a meeting
+              </button>
               <Link to="/polls/eNg6RNDvjgA">
                 <Button variant="outline" className="rounded-lg px-6 py-5 h-auto font-semibold border-slate-300">
                   View example <ArrowRight className="w-4 h-4 ml-1" />

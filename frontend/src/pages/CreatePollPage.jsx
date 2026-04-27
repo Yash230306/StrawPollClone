@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Plus, Trash2, Settings2, Sparkles, Loader2, Crown, Lock,
   Image, List, GripVertical, CalendarClock, Check, X, Star,
@@ -376,6 +376,7 @@ function MeetingOptions({ options, setOptions }) {
 /* ── Main CreatePollPage ─────────────────────────────────────── */
 export default function CreatePollPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [pollType, setPollType] = useState('basic');
   const [title, setTitle] = useState('');
@@ -387,6 +388,15 @@ export default function CreatePollPage() {
   const [multiple, setMultiple] = useState(false);
   const [requireName, setRequireName] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Auto-select poll type from ?type= query param (e.g. from dashboard)
+  useEffect(() => {
+    const typeParam = searchParams.get('type');
+    if (typeParam && POLL_TYPES.find(t => t.id === typeParam)) {
+      handleTypeChange(typeParam);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reset options when switching poll type
   const handleTypeChange = (type) => {
