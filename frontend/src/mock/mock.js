@@ -177,11 +177,24 @@ export const findPoll = async (id) => {
 };
 
 export const recordVote = async (pollId, optionIds, voterName) => {
-
   const VOTES_KEY = 'strawpoll_votes';
   const votes = JSON.parse(localStorage.getItem(VOTES_KEY) || '{}');
   votes[pollId] = optionIds;
   localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
+
+  // If this is a mock sample poll, don't hit the backend, just return success
+  if (samplePolls.some(p => p.id === pollId)) {
+    // Optionally update the mock data locally so the bar chart moves
+    const mockPoll = samplePolls.find(p => p.id === pollId);
+    if (mockPoll) {
+      optionIds.forEach(oid => {
+        const opt = mockPoll.options.find(o => o.id === oid);
+        if (opt) opt.votes += 1;
+      });
+      mockPoll.totalVotes += 1;
+    }
+    return { msg: 'Vote recorded locally for demo' };
+  }
 
   const res = await fetch(`${API_URL}/polls/${pollId}/vote`, {
     method: 'POST',
