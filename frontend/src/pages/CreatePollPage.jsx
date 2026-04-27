@@ -359,7 +359,7 @@ function MeetingOptions({ options, setOptions }) {
       options.map((o, i) =>
       _jsxs("div", { className: "flex items-center gap-3", children: [
         _jsx("div", { className: "w-7 h-7 rounded-full bg-amber-50 text-amber-600 text-xs font-bold flex items-center justify-center shrink-0", children: i + 1 }),
-        _jsx("input", { type: "date", value: o.date, onChange: (e) => update(o.id, 'date', e.target.value),
+        _jsx("input", { type: "date", min: new Date().toISOString().split('T')[0], value: o.date, onChange: (e) => update(o.id, 'date', e.target.value),
           className: "flex-1 h-11 border border-slate-200 rounded-xl px-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400" }),
         _jsx("input", { type: "time", value: o.time, onChange: (e) => update(o.id, 'time', e.target.value),
           className: "w-32 h-11 border border-slate-200 rounded-xl px-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400" }),
