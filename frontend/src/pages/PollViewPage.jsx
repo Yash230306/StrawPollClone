@@ -258,7 +258,10 @@ export default function PollViewPage() {
               "Vote" }
 
             ),
-            _jsxs("button", { className: "inline-flex items-center gap-1 text-xs text-slate-500 hover:text-red-500 transition-colors", children: [
+            _jsxs("button", { 
+              type: "button",
+              onClick: () => toast({ title: 'Report Submitted', description: 'This poll will be sent for investigation.' }),
+              className: "inline-flex items-center gap-1 text-xs text-slate-500 hover:text-red-500 transition-colors", children: [
               _jsx(Flag, { className: "w-3.5 h-3.5" }), " Report"] }
             )] }
           ) :

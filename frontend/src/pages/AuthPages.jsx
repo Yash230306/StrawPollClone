@@ -125,8 +125,7 @@ export function LoginPage() {
 
           _jsxs("div", { className: "space-y-1", children: [
             _jsxs("div", { className: "flex items-center justify-between", children: [
-              _jsx("label", { htmlFor: "login-password", className: "text-xs font-semibold text-slate-600 uppercase tracking-wide", children: "Password" }),
-              _jsx("a", { href: "#", className: "text-xs text-indigo-600 hover:text-indigo-700 hover:underline font-medium", children: "Forgot password?" })] }
+              _jsx("label", { htmlFor: "login-password", className: "text-xs font-semibold text-slate-600 uppercase tracking-wide", children: "Password" })] }
             ),
             _jsx(FormInput, {
               id: "login-password",
