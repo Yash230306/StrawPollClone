@@ -1,61 +1,61 @@
 const mongoose = require('mongoose');
 
 const OptionSchema = new mongoose.Schema({
-  label:    { type: String, required: true },
+  label: { type: String, required: true },
   imageUrl: { type: String, default: '' },
-  votes:    { type: Number, default: 0 },
-  voters:   [{ type: String }],
+  votes: { type: Number, default: 0 },
+  voters: [{ type: String }]
 });
 
 const PollSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true,
+    required: true
   },
   description: {
     type: String,
-    default: '',
+    default: ''
   },
   author: {
     type: String,
-    required: true,
+    required: true
   },
-  // Null for anonymous/guest polls — they never show in any dashboard
+
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    default: null,
+    default: null
   },
   multiple: {
     type: Boolean,
-    default: false,
+    default: false
   },
   requireName: {
     type: Boolean,
-    default: false,
+    default: false
   },
   pollType: {
     type: String,
     enum: ['basic', 'image', 'ranking', 'meeting'],
-    default: 'basic',
+    default: 'basic'
   },
   requireName: {
     type: Boolean,
-    default: false,
+    default: false
   },
   options: [OptionSchema],
-  // Count of unique voters (not total selections)
+
   totalVotes: {
     type: Number,
-    default: 0,
+    default: 0
   },
-  // Store voter fingerprints to prevent duplicate votes
-  // Each entry: IP address or browser fingerprint
+
+
   voterIds: {
     type: [String],
     default: [],
-    select: false, // don't return this field by default
-  },
+    select: false
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Poll', PollSchema);

@@ -8,15 +8,15 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `http://localhost:${process.env.PORT || 5001}/api/auth/google/callback`,
+      callbackURL: `http://localhost:${process.env.PORT || 5001}/api/auth/google/callback`
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user already exists with this Google ID
+
         let user = await User.findOne({ googleId: profile.id });
         if (user) return done(null, user);
 
-        // Check if user exists with the same email (link accounts)
+
         const email = profile.emails?.[0]?.value;
         if (email) {
           user = await User.findOne({ email });
@@ -28,13 +28,13 @@ passport.use(
           }
         }
 
-        // Create new user
+
         user = await User.create({
           googleId: profile.id,
           name: profile.displayName,
           email: email || `${profile.id}@google.com`,
-          password: Math.random().toString(36).slice(-12), // random password
-          avatar: profile.photos?.[0]?.value,
+          password: Math.random().toString(36).slice(-12),
+          avatar: profile.photos?.[0]?.value
         });
         done(null, user);
       } catch (err) {
@@ -50,15 +50,15 @@ passport.use(
       clientID: process.env.FACEBOOK_APP_ID,
       clientSecret: process.env.FACEBOOK_APP_SECRET,
       callbackURL: `http://localhost:${process.env.PORT || 5001}/api/auth/facebook/callback`,
-      profileFields: ['id', 'displayName', 'emails', 'photos'],
+      profileFields: ['id', 'displayName', 'emails', 'photos']
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user already exists with this Facebook ID
+
         let user = await User.findOne({ facebookId: profile.id });
         if (user) return done(null, user);
 
-        // Check if user exists with the same email (link accounts)
+
         const email = profile.emails?.[0]?.value;
         if (email) {
           user = await User.findOne({ email });
@@ -70,13 +70,13 @@ passport.use(
           }
         }
 
-        // Create new user
+
         user = await User.create({
           facebookId: profile.id,
           name: profile.displayName,
           email: email || `${profile.id}@facebook.com`,
-          password: Math.random().toString(36).slice(-12), // random password
-          avatar: profile.photos?.[0]?.value,
+          password: Math.random().toString(36).slice(-12),
+          avatar: profile.photos?.[0]?.value
         });
         done(null, user);
       } catch (err) {

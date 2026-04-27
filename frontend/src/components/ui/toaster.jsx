@@ -1,33 +1,33 @@
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
 import {
   Toast,
   ToastClose,
   ToastDescription,
   ToastProvider,
   ToastTitle,
-  ToastViewport,
-} from "@/components/ui/toast"
+  ToastViewport } from
+"@/components/ui/toast";import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts } = useToast();
 
   return (
-    <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+    _jsxs(ToastProvider, { children: [
+      toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
-            </div>
-            {action}
-            <ToastClose />
-          </Toast>
-        );
-      })}
-      <ToastViewport />
-    </ToastProvider>
-  );
+          _jsxs(Toast, { ...props, children: [
+            _jsxs("div", { className: "grid gap-1", children: [
+              title && _jsx(ToastTitle, { children: title }),
+              description &&
+              _jsx(ToastDescription, { children: description })] }
+
+            ),
+            action,
+            _jsx(ToastClose, {})] }, id
+          ));
+
+      }),
+      _jsx(ToastViewport, {})] }
+    ));
+
 }

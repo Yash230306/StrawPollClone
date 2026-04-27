@@ -3,8 +3,8 @@ const router = express.Router();
 const Poll = require('../models/Poll');
 const authMiddleware = require('../middleware/auth');
 
-// ── Get MY polls (logged-in user only) ──────────────────────────────
-// Returns only polls created by the authenticated user
+
+
 router.get('/mine', authMiddleware, async (req, res) => {
   try {
     const polls = await Poll.find({ userId: req.user.id }).sort({ createdAt: -1 });
@@ -15,7 +15,7 @@ router.get('/mine', authMiddleware, async (req, res) => {
   }
 });
 
-// ── Get all polls (public) ──────────────────────────────────────────
+
 router.get('/', async (req, res) => {
   try {
     const polls = await Poll.find().sort({ createdAt: -1 });
@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ── Get poll by ID (public) ─────────────────────────────────────────
+
 router.get('/:id', async (req, res) => {
   try {
     const poll = await Poll.findById(req.params.id);
@@ -39,14 +39,14 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ── Create a new poll ───────────────────────────────────────────────
-// If a valid JWT is sent, links the poll to that user.
-// If no token, poll is anonymous (userId = null) and won't appear in any dashboard.
+
+
+
 router.post('/', async (req, res) => {
   try {
     const { title, description, author, multiple, options, pollType, requireName } = req.body;
 
-    // Try to extract userId from optional Authorization header
+
     let userId = null;
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -55,14 +55,14 @@ router.post('/', async (req, res) => {
         const decoded = jwt.verify(authHeader.replace('Bearer ', ''), process.env.JWT_SECRET);
         userId = decoded.user.id;
       } catch (_) {
-        // Invalid token — treat as anonymous
+
       }
     }
 
-    const mappedOptions = options.map(opt => ({
+    const mappedOptions = options.map((opt) => ({
       label: opt.label || opt,
       imageUrl: opt.imageUrl || '',
-      votes: 0,
+      votes: 0
     }));
 
     const newPoll = new Poll({
@@ -74,7 +74,7 @@ router.post('/', async (req, res) => {
       pollType: pollType || 'basic',
       options: mappedOptions,
       totalVotes: 0,
-      userId, // null for guests, ObjectId for logged-in users
+      userId
     });
 
     const poll = await newPoll.save();
@@ -85,30 +85,30 @@ router.post('/', async (req, res) => {
   }
 });
 
-// ── Vote on a poll ──────────────────────────────────────────────────
-// Uses IP + user-agent as a voter fingerprint to prevent duplicate votes.
+
+
 router.post('/:id/vote', async (req, res) => {
   try {
     const { optionIds, voterName } = req.body;
 
-    // Build a voter fingerprint from IP + user-agent
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
-      || req.socket?.remoteAddress
-      || 'unknown';
+
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    req.socket?.remoteAddress ||
+    'unknown';
     const ua = req.headers['user-agent'] || '';
     const voterId = Buffer.from(`${ip}::${ua}`).toString('base64').slice(0, 40);
 
-    // Load the poll including voterIds
+
     const poll = await Poll.findById(req.params.id).select('+voterIds');
     if (!poll) return res.status(404).json({ msg: 'Poll not found' });
 
-    // Reject if this voter already voted
+
     if (poll.voterIds.includes(voterId)) {
       return res.status(400).json({ msg: 'You have already voted on this poll.' });
     }
 
-    // Record votes per option
-    optionIds.forEach(id => {
+
+    optionIds.forEach((id) => {
       const option = poll.options.id(id);
       if (option) {
         option.votes += 1;
@@ -118,13 +118,13 @@ router.post('/:id/vote', async (req, res) => {
       }
     });
 
-    // Increment totalVotes by 1 per voter (not per selection)
+
     poll.totalVotes += 1;
     poll.voterIds.push(voterId);
 
     await poll.save();
 
-    // Return poll without voterIds
+
     const { voterIds: _v, ...pollObj } = poll.toObject();
     res.json(pollObj);
   } catch (err) {
@@ -133,7 +133,7 @@ router.post('/:id/vote', async (req, res) => {
   }
 });
 
-// ── Delete a poll (owner only) ──────────────────────────────────────
+
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const poll = await Poll.findById(req.params.id);

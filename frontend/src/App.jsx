@@ -12,37 +12,37 @@ import DashboardPage from './pages/DashboardPage';
 import { TemplatesPage, DemoPage, MeetingsPage, LegalPage, AboutPage } from './pages/OtherPages';
 import { Toaster } from './components/ui/toaster';
 
-import { getAuth } from './mock/mock';
+import { getAuth } from './mock/mock';import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 
 const HomeRoute = () => {
   const user = getAuth();
-  return user ? <Navigate to="/dashboard" replace /> : <HomePage />;
+  return user ? _jsx(Navigate, { to: "/dashboard", replace: true }) : _jsx(HomePage, {});
 };
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<HomeRoute />} />
-          <Route path="/create" element={<CreatePollPage />} />
-          <Route path="/polls/:id" element={<PollViewPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/templates" element={<TemplatesPage />} />
-          <Route path="/demo" element={<Navigate to="/polls/eNg6RNDvjgA" replace />} />
-          <Route path="/meetings" element={<MeetingsPage />} />
-          <Route path="/legal" element={<LegalPage />} />
-          <Route path="/about" element={<AboutPage />} />
-        </Routes>
-        <Footer />
-        <Toaster />
-      </BrowserRouter>
-    </div>
-  );
+    _jsx("div", { className: "App", children:
+      _jsxs(BrowserRouter, { children: [
+        _jsx(Navbar, {}),
+        _jsxs(Routes, { children: [
+          _jsx(Route, { path: "/", element: _jsx(HomeRoute, {}) }),
+          _jsx(Route, { path: "/create", element: _jsx(CreatePollPage, {}) }),
+          _jsx(Route, { path: "/polls/:id", element: _jsx(PollViewPage, {}) }),
+          _jsx(Route, { path: "/pricing", element: _jsx(PricingPage, {}) }),
+          _jsx(Route, { path: "/login", element: _jsx(LoginPage, {}) }),
+          _jsx(Route, { path: "/signup", element: _jsx(SignupPage, {}) }),
+          _jsx(Route, { path: "/dashboard", element: _jsx(DashboardPage, {}) }),
+          _jsx(Route, { path: "/templates", element: _jsx(TemplatesPage, {}) }),
+          _jsx(Route, { path: "/demo", element: _jsx(Navigate, { to: "/polls/eNg6RNDvjgA", replace: true }) }),
+          _jsx(Route, { path: "/meetings", element: _jsx(MeetingsPage, {}) }),
+          _jsx(Route, { path: "/legal", element: _jsx(LegalPage, {}) }),
+          _jsx(Route, { path: "/about", element: _jsx(AboutPage, {}) })] }
+        ),
+        _jsx(Footer, {}),
+        _jsx(Toaster, {})] }
+      ) }
+    ));
+
 }
 
 export default App;
