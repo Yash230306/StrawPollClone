@@ -11,7 +11,7 @@ router.get('/mine', authMiddleware, async (req, res) => {
     res.json(polls);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: err.message || 'Server Error' });
   }
 });
 
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
     res.json(polls);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: err.message || 'Server Error' });
   }
 });
 
@@ -35,7 +35,7 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     if (err.kind === 'ObjectId') return res.status(404).json({ msg: 'Poll not found' });
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: err.message || 'Server Error' });
   }
 });
 
@@ -81,7 +81,7 @@ router.post('/', async (req, res) => {
     res.json(poll);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: err.message || 'Server Error' });
   }
 });
 
@@ -129,7 +129,7 @@ router.post('/:id/vote', async (req, res) => {
     res.json(pollObj);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: err.message || 'Server Error' });
   }
 });
 
@@ -147,7 +147,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     res.json({ msg: 'Poll deleted' });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: err.message || 'Server Error' });
   }
 });
 

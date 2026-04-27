@@ -29,7 +29,7 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.json({ user: { id: user.id, name: user.name, email: user.email, isPremium: user.isPremium } });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: err.message || 'Server error' });
   }
 });
 
@@ -46,7 +46,7 @@ router.post('/upgrade', authMiddleware, async (req, res) => {
     makeToken(user, res);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: err.message || 'Server error' });
   }
 });
 
@@ -72,7 +72,7 @@ router.post('/register', async (req, res) => {
     makeToken(user, res);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: err.message || 'Server error' });
   }
 });
 
@@ -95,7 +95,7 @@ router.post('/login', async (req, res) => {
     makeToken(user, res);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: err.message || 'Server error' });
   }
 });
 
