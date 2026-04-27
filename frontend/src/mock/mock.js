@@ -187,10 +187,18 @@ export const recordVote = async (pollId, optionIds, voterName) => {
     // Optionally update the mock data locally so the bar chart moves
     const mockPoll = samplePolls.find(p => p.id === pollId);
     if (mockPoll) {
-      optionIds.forEach(oid => {
-        const opt = mockPoll.options.find(o => o.id === oid);
-        if (opt) opt.votes += 1;
-      });
+      if (mockPoll.pollType === 'ranking') {
+        const maxPoints = optionIds.length;
+        optionIds.forEach((oid, index) => {
+          const opt = mockPoll.options.find(o => o.id === oid);
+          if (opt) opt.votes += (maxPoints - index);
+        });
+      } else {
+        optionIds.forEach(oid => {
+          const opt = mockPoll.options.find(o => o.id === oid);
+          if (opt) opt.votes += 1;
+        });
+      }
       mockPoll.totalVotes += 1;
     }
     return { msg: 'Vote recorded locally for demo' };

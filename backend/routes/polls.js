@@ -108,15 +108,28 @@ router.post('/:id/vote', async (req, res) => {
     }
 
 
-    optionIds.forEach((id) => {
-      const option = poll.options.id(id);
-      if (option) {
-        option.votes += 1;
-        if (voterName && voterName.trim()) {
-          option.voters.push(voterName.trim());
+    if (poll.pollType === 'ranking') {
+      const maxPoints = optionIds.length;
+      optionIds.forEach((id, index) => {
+        const option = poll.options.id(id);
+        if (option) {
+          option.votes += (maxPoints - index); // Distribute points
+          if (voterName && voterName.trim()) {
+            option.voters.push(voterName.trim());
+          }
         }
-      }
-    });
+      });
+    } else {
+      optionIds.forEach((id) => {
+        const option = poll.options.id(id);
+        if (option) {
+          option.votes += 1;
+          if (voterName && voterName.trim()) {
+            option.voters.push(voterName.trim());
+          }
+        }
+      });
+    }
 
 
     poll.totalVotes += 1;

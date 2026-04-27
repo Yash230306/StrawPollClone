@@ -109,7 +109,7 @@ export default function PollViewPage() {
               _jsx("h1", { className: "text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight", children: poll.title }),
               poll.description && _jsx("p", { className: "mt-3 text-slate-600", children: poll.description }),
               _jsxs("div", { className: "mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500", children: [
-                _jsxs("span", { className: "inline-flex items-center gap-1", children: [_jsx(Users, { className: "w-3.5 h-3.5" }), " ", totalVotes.toLocaleString(), " votes"] }),
+                _jsxs("span", { className: "inline-flex items-center gap-1", children: [_jsx(Users, { className: "w-3.5 h-3.5" }), " ", totalVotes.toLocaleString(), poll.pollType === 'ranking' ? " points" : " votes"] }),
                 _jsxs("span", { className: "inline-flex items-center gap-1", children: [_jsx(Clock, { className: "w-3.5 h-3.5" }), " ", poll.createdAt] }),
                 _jsxs("span", { children: ["by ", _jsx("span", { className: "font-semibold text-slate-700", children: poll.author })] }),
                 poll.multiple && _jsx("span", { className: "px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 font-medium", children: "Multiple choice" })] }
@@ -167,7 +167,7 @@ export default function PollViewPage() {
                       hasVoted &&
                       _jsxs("div", { className: "mt-2 w-full", children: [
                         _jsxs("div", { className: "flex items-center justify-between text-xs mb-1.5", children: [
-                          _jsxs("span", { className: "text-slate-500 font-medium", children: [o.votes.toLocaleString(), " votes"] }),
+                          _jsxs("span", { className: "text-slate-500 font-medium", children: [o.votes.toLocaleString(), poll.pollType === 'ranking' ? " points" : " votes"] }),
                           _jsxs("span", { className: "font-bold text-slate-900", children: [percent, "%"] })] }
                         ),
                         _jsx("div", { className: "h-2 bg-slate-100 rounded-full overflow-hidden", children:
@@ -203,7 +203,7 @@ export default function PollViewPage() {
                         _jsx("span", { className: `font-semibold truncate ${i === 0 ? 'text-indigo-700' : 'text-slate-800'}`, children: o.label })] }
                       ),
                       _jsxs("div", { className: "flex items-center gap-3 shrink-0", children: [
-                        _jsxs("span", { className: "text-xs text-slate-500", children: [o.votes.toLocaleString(), " votes"] }),
+                        _jsxs("span", { className: "text-xs text-slate-500", children: [o.votes.toLocaleString(), poll.pollType === 'ranking' ? " points" : " votes"] }),
                         _jsxs("span", { className: "text-sm font-bold text-slate-900 w-12 text-right", children: [percent, "%"] })] }
                       )] }
                     ),

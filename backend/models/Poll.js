@@ -39,10 +39,7 @@ const PollSchema = new mongoose.Schema({
     enum: ['basic', 'image', 'ranking', 'meeting'],
     default: 'basic'
   },
-  requireName: {
-    type: Boolean,
-    default: false
-  },
+
   options: [OptionSchema],
 
   totalVotes: {
