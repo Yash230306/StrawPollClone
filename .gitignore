@@ -3,5 +3,13 @@ dist
 dist-ssr
 *.local
 .npm-cache
+
+# Env files — never commit secrets
 .env
+backend/.env
+
+# OS files
 .DS_Store
+
+# Backend dependencies
+backend/node_modules

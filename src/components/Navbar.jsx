@@ -70,18 +70,6 @@ export default function Navbar() {
                 </Link>
               </li>
             ))}
-            <li>
-              <Link
-                to="/templates"
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname === '/templates'
-                    ? 'text-indigo-600'
-                    : 'text-slate-700 hover:text-indigo-600'
-                }`}
-              >
-                Templates
-              </Link>
-            </li>
           </ul>
         </div>
 
@@ -133,7 +121,7 @@ export default function Navbar() {
       {open && (
         <div className="lg:hidden border-t border-slate-200 bg-white">
           <div className="px-5 py-4 flex flex-col gap-1">
-            {[...navLinks, { label: 'Templates', path: '/templates' }].map((l) => (
+            {navLinks.map((l) => (
               <Link
                 key={l.path}
                 to={l.path}

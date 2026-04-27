@@ -2,7 +2,6 @@
 
 export const navLinks = [
   { label: 'Create Poll', path: '/create' },
-  { label: 'Schedule Meeting', path: '/meetings' },
   { label: 'Demo', path: '/demo' },
   { label: 'Pricing', path: '/pricing' },
 ];
@@ -196,66 +195,136 @@ export const testimonials = [
   },
 ];
 
-// localStorage helpers
-const POLLS_KEY = 'strawpoll_polls';
-const VOTES_KEY = 'strawpoll_votes';
-const AUTH_KEY = 'strawpoll_auth';
+// API helpers
+const API_URL = '/api';
 
-export const getStoredPolls = () => {
+/** Returns auth header object if user is logged in, else empty object */
+const authHeaders = () => {
+  const user = getAuth();
+  if (user?.token) return { Authorization: `Bearer ${user.token}` };
+  return {};
+};
+
+/**
+ * Fetch the logged-in user's own polls from /api/polls/mine.
+ * Returns [] if not logged in or backend fails.
+ */
+export const getStoredPolls = async () => {
   try {
-    const raw = localStorage.getItem(POLLS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
+    const user = getAuth();
+    if (!user?.token) return [];
+    const res = await fetch(`${API_URL}/polls/mine`, {
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) throw new Error('Failed to fetch polls');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
 };
 
-export const savePoll = (poll) => {
-  const polls = getStoredPolls();
-  polls.unshift(poll);
-  localStorage.setItem(POLLS_KEY, JSON.stringify(polls));
+/**
+ * Create a new poll.
+ * If logged in, sends the JWT so the poll is linked to that user.
+ * If not logged in, the poll is anonymous (won't show in any dashboard).
+ */
+export const savePoll = async (poll) => {
+  try {
+    const res = await fetch(`${API_URL}/polls`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(poll),
+    });
+    if (!res.ok) throw new Error('Failed to create poll');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };
 
-export const findPoll = (id) => {
-  const all = [...getStoredPolls(), ...samplePolls];
-  return all.find(p => p.id === id);
+/**
+ * Delete a poll by ID. Requires auth.
+ */
+export const deletePoll = async (pollId) => {
+  try {
+    const res = await fetch(`${API_URL}/polls/${pollId}`, {
+      method: 'DELETE',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) throw new Error('Failed to delete poll');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };
 
-export const recordVote = (pollId, optionIds) => {
+export const findPoll = async (id) => {
+  try {
+    const res = await fetch(`${API_URL}/polls/${id}`);
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.error(err);
+  }
+  // Fallback to sample polls for demo purposes
+  return samplePolls.find(p => p.id === id || p._id === id);
+};
+
+export const recordVote = async (pollId, optionIds) => {
+  // Track locally so the UI knows what the user voted
+  const VOTES_KEY = 'strawpoll_votes';
   const votes = JSON.parse(localStorage.getItem(VOTES_KEY) || '{}');
   votes[pollId] = optionIds;
   localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
 
-  // update stored polls
-  const polls = getStoredPolls();
-  const idx = polls.findIndex(p => p.id === pollId);
-  if (idx >= 0) {
-    optionIds.forEach(oid => {
-      const opt = polls[idx].options.find(o => o.id === oid);
-      if (opt) opt.votes += 1;
-    });
-    polls[idx].totalVotes += optionIds.length;
-    localStorage.setItem(POLLS_KEY, JSON.stringify(polls));
-  } else {
-    // update sample polls in-memory (cloned)
-    const sample = samplePolls.find(p => p.id === pollId);
-    if (sample) {
-      optionIds.forEach(oid => {
-        const opt = sample.options.find(o => o.id === oid);
-        if (opt) opt.votes += 1;
-      });
-      sample.totalVotes += optionIds.length;
-    }
-  }
+  const res = await fetch(`${API_URL}/polls/${pollId}/vote`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ optionIds }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.msg || 'Failed to record vote');
+  return data;
 };
 
 export const getUserVote = (pollId) => {
+  const VOTES_KEY = 'strawpoll_votes';
   const votes = JSON.parse(localStorage.getItem(VOTES_KEY) || '{}');
   return votes[pollId] || null;
 };
+
+const AUTH_KEY = 'strawpoll_auth';
 
 export const getAuth = () => {
   try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch { return null; }
 };
 export const setAuth = (user) => localStorage.setItem(AUTH_KEY, JSON.stringify(user));
 export const clearAuth = () => localStorage.removeItem(AUTH_KEY);
+
+/** Returns true if current logged-in user has premium */
+export const isPremiumUser = () => {
+  const u = getAuth();
+  return u?.isPremium === true;
+};
+
+/**
+ * Upgrade the current user to premium (1-click).
+ * Calls /api/auth/upgrade, gets a fresh JWT with isPremium:true, saves it.
+ */
+export const upgradeToPremium = async () => {
+  const user = getAuth();
+  if (!user?.token) throw new Error('Not logged in');
+  const res = await fetch('/api/auth/upgrade', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'application/json' },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.msg || 'Upgrade failed');
+  // Store the new token that contains isPremium: true
+  setAuth({ name: data.user.name, email: data.user.email, token: data.token, isPremium: true });
+  return data;
+};
 
 export const generateId = () => Math.random().toString(36).substring(2, 11);

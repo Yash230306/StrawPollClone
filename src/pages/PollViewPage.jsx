@@ -19,10 +19,13 @@ export default function PollViewPage() {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    const p = findPoll(id);
-    setPoll(p);
-    const prev = getUserVote(id);
-    if (prev) { setSelected(prev); setHasVoted(true); }
+    const fetchPollData = async () => {
+      const p = await findPoll(id);
+      setPoll(p);
+      const prev = getUserVote(id);
+      if (prev) { setSelected(prev); setHasVoted(true); }
+    };
+    fetchPollData();
   }, [id, tick]);
 
   const totalVotes = useMemo(() => poll?.options.reduce((a, o) => a + o.votes, 0) || 0, [poll, tick]);
@@ -51,15 +54,31 @@ export default function PollViewPage() {
     }
   };
 
-  const submitVote = () => {
+  const submitVote = async () => {
     if (selected.length === 0) {
       toast({ title: 'Select an option', variant: 'destructive' });
       return;
     }
-    recordVote(poll.id, selected);
-    setHasVoted(true);
-    setTick(t => t + 1);
-    toast({ title: 'Vote recorded!', description: 'Thank you for voting.' });
+    const pollId = poll._id || poll.id;
+    const formattedSelection = selected.map(oid => {
+      const option = poll.options.find(o => o.id === oid || o._id === oid);
+      return option?._id || option?.id || oid;
+    });
+    try {
+      await recordVote(pollId, formattedSelection);
+      setHasVoted(true);
+      setTick(t => t + 1);
+      toast({ title: '✅ Vote recorded!', description: 'Thank you for voting.' });
+    } catch (err) {
+      if (err.message?.includes('already voted')) {
+        // Mark as voted locally so the UI shows results
+        setHasVoted(true);
+        setTick(t => t + 1);
+        toast({ title: 'Already voted', description: 'You have already voted on this poll.', variant: 'destructive' });
+      } else {
+        toast({ title: 'Error', description: 'Could not record your vote. Try again.', variant: 'destructive' });
+      }
+    }
   };
 
   const copyLink = () => {
@@ -103,11 +122,12 @@ export default function PollViewPage() {
 
           <div className="mt-8 space-y-3">
             {(hasVoted ? sortedOptions : poll.options).map((o, i) => {
-              const isSelected = selected.includes(o.id);
+              const optId = o._id || o.id;
+              const isSelected = selected.includes(optId);
               const percent = pct(o.votes);
               if (hasVoted) {
                 return (
-                  <div key={o.id} className="relative p-4 rounded-xl border border-slate-200 bg-white overflow-hidden">
+                  <div key={optId} className="relative p-4 rounded-xl border border-slate-200 bg-white overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-100 to-indigo-50"
                       style={{ width: `${percent}%`, transition: 'width 700ms ease-out' }}
@@ -128,8 +148,8 @@ export default function PollViewPage() {
               return (
                 <button
                   type="button"
-                  key={o.id}
-                  onClick={() => toggleSelect(o.id)}
+                  key={optId}
+                  onClick={() => toggleSelect(optId)}
                   className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
                     isSelected
                       ? 'border-indigo-500 bg-indigo-50'

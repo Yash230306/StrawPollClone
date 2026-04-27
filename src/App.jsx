@@ -10,6 +10,7 @@ import PricingPage from './pages/PricingPage';
 import { LoginPage, SignupPage } from './pages/AuthPages';
 import DashboardPage from './pages/DashboardPage';
 import { TemplatesPage, DemoPage, MeetingsPage } from './pages/OtherPages';
+import OAuthCallbackPage from './pages/OAuthCallbackPage';
 import { Toaster } from './components/ui/toaster';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           <Route path="/templates" element={<TemplatesPage />} />
           <Route path="/demo" element={<DemoPage />} />
           <Route path="/meetings" element={<MeetingsPage />} />
+          <Route path="/oauth-callback" element={<OAuthCallbackPage />} />
         </Routes>
         <Footer />
         <Toaster />
