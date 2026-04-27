@@ -4,6 +4,7 @@ const OptionSchema = new mongoose.Schema({
   label:    { type: String, required: true },
   imageUrl: { type: String, default: '' },
   votes:    { type: Number, default: 0 },
+  voters:   [{ type: String }],
 });
 
 const PollSchema = new mongoose.Schema({
@@ -26,6 +27,10 @@ const PollSchema = new mongoose.Schema({
     default: null,
   },
   multiple: {
+    type: Boolean,
+    default: false,
+  },
+  requireName: {
     type: Boolean,
     default: false,
   },

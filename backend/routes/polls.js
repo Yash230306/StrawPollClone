@@ -44,7 +44,7 @@ router.get('/:id', async (req, res) => {
 // If no token, poll is anonymous (userId = null) and won't appear in any dashboard.
 router.post('/', async (req, res) => {
   try {
-    const { title, description, author, multiple, options } = req.body;
+    const { title, description, author, multiple, options, pollType, requireName } = req.body;
 
     // Try to extract userId from optional Authorization header
     let userId = null;
@@ -61,6 +61,7 @@ router.post('/', async (req, res) => {
 
     const mappedOptions = options.map(opt => ({
       label: opt.label || opt,
+      imageUrl: opt.imageUrl || '',
       votes: 0,
     }));
 
@@ -69,6 +70,8 @@ router.post('/', async (req, res) => {
       description: description || '',
       author: author || 'Anonymous',
       multiple: multiple || false,
+      requireName: requireName || false,
+      pollType: pollType || 'basic',
       options: mappedOptions,
       totalVotes: 0,
       userId, // null for guests, ObjectId for logged-in users
@@ -86,7 +89,7 @@ router.post('/', async (req, res) => {
 // Uses IP + user-agent as a voter fingerprint to prevent duplicate votes.
 router.post('/:id/vote', async (req, res) => {
   try {
-    const { optionIds } = req.body;
+    const { optionIds, voterName } = req.body;
 
     // Build a voter fingerprint from IP + user-agent
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
@@ -107,7 +110,12 @@ router.post('/:id/vote', async (req, res) => {
     // Record votes per option
     optionIds.forEach(id => {
       const option = poll.options.id(id);
-      if (option) option.votes += 1;
+      if (option) {
+        option.votes += 1;
+        if (voterName && voterName.trim()) {
+          option.voters.push(voterName.trim());
+        }
+      }
     });
 
     // Increment totalVotes by 1 per voter (not per selection)
