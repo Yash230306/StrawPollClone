@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Poll = require('../models/Poll');
 const authMiddleware = require('../middleware/auth');
+const jwt = require('jsonwebtoken');
 
 
 
@@ -92,11 +93,25 @@ router.post('/:id/vote', async (req, res) => {
     const { optionIds, voterName } = req.body;
 
 
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-    req.socket?.remoteAddress ||
-    'unknown';
-    const ua = req.headers['user-agent'] || '';
-    const voterId = Buffer.from(`${ip}::${ua}`).toString('base64').slice(0, 40);
+    let voterId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        voterId = `user_${decoded.user.id}`;
+      } catch (err) {
+        // Invalid or expired token, ignore and fallback to IP
+      }
+    }
+
+    if (!voterId) {
+      const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+      req.socket?.remoteAddress ||
+      'unknown';
+      const ua = req.headers['user-agent'] || '';
+      voterId = Buffer.from(`${ip}::${ua}`).toString('base64').slice(0, 40);
+    }
 
 
     const poll = await Poll.findById(req.params.id).select('+voterIds');

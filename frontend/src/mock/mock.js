@@ -206,7 +206,7 @@ export const recordVote = async (pollId, optionIds, voterName) => {
 
   const res = await fetch(`${API_URL}/polls/${pollId}/vote`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ optionIds, voterName })
   });
   const data = await res.json();
